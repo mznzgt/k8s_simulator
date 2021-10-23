@@ -33,18 +33,20 @@ class APIServer:
 		mslist = re.split("\+|\.|\(|\)", deployment.msPath)
 		while '' in mslist: mslist.remove('')
 		deployment.msList = mslist
-		for ms in deployment.msList:
-			for msTemplate in self.etcd.microserviceTemplates:
-				if msTemplate.microserviceLabel == ms:
-					depMS = copy.copy(msTemplate)
-					depMS.deploymentLabel = deployment.deploymentLabel
-					self.etcd.microserviceList.append(depMS)
+		# for depMS in deployment.msList:
+		# 	for ms in self.etcd.microserviceList:
+		# 		if ms.microserviceLabel == depMS:
+					#ms.deploymentLabel = deployment.deploymentLabel
+					#print(ms.deploymentLabel)
+					#depMS.deploymentLabel = deployment.deploymentLabel
+					#self.etcd.microserviceList.append(depMS)
 		#print("Deployment " + deployment.deploymentLabel + " created")
 
 #CreateMicroserviceTemplate creates a Microservice template object from a list of arguments and stores it in etcd.
 	def CreateMicroserviceTemplate(self, info):
 		microservice = Microservice(info)
-		self.etcd.microserviceTemplates.append(microservice)
+		#self.etcd.microserviceTemplates.append(microservice)
+		self.etcd.microserviceList.append(microservice)
 
 # CreateEndpoint creates an EndPoint object using information from a provided Pod and Node and appends it 
 # to the endPointList in etcd
@@ -108,7 +110,7 @@ class APIServer:
 		if len(micro) == 1:
 			return micro[0]
 		else:
-			print('No such micro found in etcd micro list for' + msLabel )
+			print('2 No such micro found in etcd micro list for' + msLabel )
 			
 	def GetMSByLabel(self, msLabel, depLabel):
 		microservices = list(filter(lambda x: x.microserviceLabel == msLabel, filter(lambda x: x.deploymentLabel == depLabel, self.etcd.microserviceList)))

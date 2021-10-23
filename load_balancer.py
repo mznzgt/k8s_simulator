@@ -21,10 +21,12 @@ class LoadBalancer:
 		
 		def ThreadHandler(req, serList):
 			for ser in serList:
+				#print('ser is ' + ser)
 				ms=ser.replace('(','').replace(')','')
 				self.balance(req, ms)
 		self.indexArray = self.deployment.msList.copy()
 		for i in range (0, len(self.indexArray)):
+			#print(self.indexArray[i])
 			self.indexArray[i] = 0
 		while self.running:
 			self.deployment.waiting.wait()

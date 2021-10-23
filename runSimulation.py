@@ -126,7 +126,7 @@ for command in commands:
 				graphedDep.requests[0].append(len(dep.handledReqs)-len(failReqs))
 				graphedDep.requests[1].append(len(failReqs))
 				for ms in dep.msList:
-					curMS = apiServer.GetMSByLabel(ms, dep.deploymentLabel)
+					curMS = apiServer.GetMsByMsLabel(ms)
 					graphedMS = next(graphingMS for graphingMS in graphedDep.microservices if graphingMS.label == ms)
 					graphedMS.expectedList.append(curMS.expectedReplicas)
 					pendingPods = list(filter(lambda x: x.microserviceLabel == ms, apiServer.etcd.pendingPodList))
@@ -140,7 +140,7 @@ for command in commands:
 time.sleep(30)
 print("Shutting down threads")
 
-assert sum([1, 2, 3]) == 5, "Should be 6"
+#assert sum([1, 2, 3]) == 5, "Should be 6"
 
 depController.running = False
 scheduler.running = False
@@ -173,9 +173,9 @@ for dep in deploymentGraphing:
 		plt.plot(steps, ms.crashedList, label = "Failed pods")
 		plt.plot(steps, ms.pendingList, label = "Pending pods")
 		plt.plot(steps, ms.expectedList, label = "Expected pods")
-		plt.title("Pods for "+ dep.deploymentLabel+", "+ms.label)
+		plt.title("Pods for"+ms.label)
 		plt.legend()
-		plt.savefig(dep.deploymentLabel+ms.label+".png")
+		plt.savefig(ms.label+".png")
 		plt.show()
 
 		
