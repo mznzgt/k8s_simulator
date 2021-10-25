@@ -36,6 +36,8 @@ class HPA:
 					#eps = self.apiServer.GetEndPointsByLabel(self.deploymentLabel, ms)
 					eps = self.apiServer.GetEndPoints()
 					pods = []
+					allPods = self.apiServer.GetPending()
+					allDeps = self.apiServer.GetDeployments()
 					for pod in self.apiServer.GetPending():
 							if pod.microserviceLabel == self.microserviceLabel:
 								pods.append(pod)
@@ -50,12 +52,23 @@ class HPA:
 					else:
 						averageUtil = (microservice.cpuCost*len(pods)-availableCPUS)/(microservice.cpuCost*len(pods))
 					newReps = math.ceil(microservice.currentReplicas * averageUtil/self.setPoint)
-					if newReps < self.minReps:
-						microservice.expectedReplicas = self.minReps
-					elif newReps > self.maxReps:
-						microservice.expectedReplicas = self.maxReps
+
+					#for x in range(len(self.apiServer.etcd.requestsList)):
+						#print(self.apiServer.etcd.requestsList[x])
+					#print("End of List")
+
+					if self.microserviceLabel in self.apiServer.etcd.requestsList:
+						if newReps < self.minReps:
+							microservice.expectedReplicas = self.minReps
+						elif newReps > self.maxReps:
+							microservice.expectedReplicas = self.maxReps
+						else:
+							microservice.expectedReplicas = newReps
+
 					else:
-						microservice.expectedReplicas = newReps
+						#print("no request for micro" + self.microserviceLabel)
+						microservice.currentReplicas = 0;
+						microservice.expectedReplicas = 0;
 					
 			time.sleep(self.time)
 		print("HPA Shutdown")

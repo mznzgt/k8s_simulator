@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from request import Request
 import threading
 
+
 #The Pod is the unit of scaling within Kubernetes. It encapsulates the running containerized application
 #name is the name of the Pod. This is the deploymentLabel with the replica number as a suffix. ie "deploymentA1"
 #handlingTime is the duration taken to handle requests.
@@ -15,7 +16,8 @@ import threading
 #the pool is the threads that are available for request handling on the pod
 #reqs are the active or queued requests
 class Pod:
-	def __init__(self, NAME, ASSIGNED_CPU, MSLABEL, HANDLINGTIME):
+	def __init__(self, NAME, ASSIGNED_CPU, MSLABEL, HANDLINGTIME, APIServer):
+		self.apiServer = APIServer
 		self.podName = NAME
 		self.handlingTime = HANDLINGTIME
 		self.assigned_cpu = ASSIGNED_CPU
@@ -26,11 +28,14 @@ class Pod:
 		self.pool = ThreadPoolExecutor(max_workers=ASSIGNED_CPU)
 		self.requests = []
 
-	def HandleRequest(self, REQUEST):
+	def HandleRequest(self, REQUEST, MS):
 		def ThreadHandler():
+			self.apiServer.etcd.requestsList.append(MS)
 			self.available_cpu -=1
 			self.crash.wait(timeout=(REQUEST.fail.wait(timeout=self.handlingTime)))
+			self.apiServer.etcd.requestsList.remove(MS)
 			self.available_cpu +=1
+			#print(f"Request_{REQUEST.label} finish handled" + self.microserviceLabel)
 			if self.crash.isSet():
 				REQUEST.fail.set()
 		if len(self.requests)>(self.assigned_cpu*self.handlingTime):

@@ -18,7 +18,7 @@ class DepController:
 			with self.apiServer.etcdLock:
 				for microservice in self.apiServer.etcd.microserviceList:
 					while microservice.currentReplicas < microservice.expectedReplicas:
-						self.apiServer.CreatePod(microservice)
+						self.apiServer.CreatePod(microservice, self.apiServer)
 						microservice.currentReplicas +=1
 					#endPoints = self.apiServer.GetEndPointsByLabel(microservice.deploymentLabel, microservice.microserviceLabel)
 					endPoints = self.apiServer.GetEndPointsByMSLabel(microservice.microserviceLabel)

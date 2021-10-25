@@ -59,7 +59,12 @@ class LoadBalancer:
 			#print('endpoints found for microservice' + MS)
 			endPoints.sort(key=lambda x: x.pod.available_cpu, reverse=True)
 			pod = self.apiServer.GetPod(endPoints[0])
-			pod.HandleRequest(request)
+			pod.HandleRequest(request, MS)
+
+			#for x in range(len(self.apiServer.etcd.requestsList)):
+				#print(self.apiServer.etcd.requestsList[x])
+			#print("End of List")
+
 
 			
 		

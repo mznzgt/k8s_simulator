@@ -112,7 +112,7 @@ for command in commands:
 	if cmdAttributes[0] == 'Sleep':
 		count+=1
 		time.sleep(int(cmdAttributes[1]))
-	
+
 	for graphedNode in nodeGraphing:
 		for node in apiServer.etcd.nodeList:
 			if node.label == graphedNode.label:
@@ -130,10 +130,13 @@ for command in commands:
 					graphedMS = next(graphingMS for graphingMS in graphedDep.microservices if graphingMS.label == ms)
 					graphedMS.expectedList.append(curMS.expectedReplicas)
 					pendingPods = list(filter(lambda x: x.microserviceLabel == ms, apiServer.etcd.pendingPodList))
-					activePods = len(apiServer.GetEndPointsByMSLabel(ms))
+					mss = apiServer.GetMsByMsLabel(ms)
+					#activePods = mss.currentReplicas
+					#activePods = len(apiServer.GetEndPointsByMSLabel(ms))
+					graphedMS.activeList.append(mss.currentReplicas)
 					failedPods = list(filter(lambda x: x.microserviceLabel == ms, filter(lambda x: x.status == "FAILED", apiServer.etcd.runningPodList)))
 					graphedMS.pendingList.append(len(pendingPods))
-					graphedMS.activeList.append((activePods))
+					#graphedMS.activeList.append((activeList))
 					graphedMS.crashedList.append(len(failedPods))
 	curStep+=1
 	steps.append(curStep)
@@ -141,6 +144,7 @@ time.sleep(30)
 print("Shutting down threads")
 
 #assert sum([1, 2, 3]) == 5, "Should be 6"
+
 
 depController.running = False
 scheduler.running = False
@@ -170,12 +174,14 @@ for dep in deploymentGraphing:
 	
 	for ms in dep.microservices:
 		plt.plot(steps, ms.activeList, label = "Active pods")
-		plt.plot(steps, ms.crashedList, label = "Failed pods")
-		plt.plot(steps, ms.pendingList, label = "Pending pods")
-		plt.plot(steps, ms.expectedList, label = "Expected pods")
+		#plt.plot(steps, ms.crashedList, label = "Failed pods")
+		#plt.plot(steps, ms.pendingList, label = "Pending pods")
+		#plt.plot(steps, ms.expectedList, label = "Expected pods")
 		plt.title("Pods for"+ms.label)
+		plt.title("Pods for " + ms.label)
 		plt.legend()
-		plt.savefig(ms.label+".png")
+		#plt.savefig(ms.label+".png")
+		plt.savefig(ms.label + ".png")
 		plt.show()
 
 		

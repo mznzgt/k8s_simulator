@@ -151,9 +151,9 @@ class APIServer:
 
 
 # CreatePod finds the resource allocations associated with a deployment and creates a pod using those metrics
-	def CreatePod(self, microservice):
+	def CreatePod(self, microservice, APISERVER):
 		podName = microservice.microserviceLabel + "_" + str(self.GeneratePodName())
-		pod = Pod(podName, microservice.cpuCost, microservice.microserviceLabel, microservice.handlingTime)
+		pod = Pod(podName, microservice.cpuCost, microservice.microserviceLabel, microservice.handlingTime, APISERVER)
 		#print("Pod " + pod.podName + " created")
 		self.etcd.pendingPodList.append(pod)
 		
@@ -196,5 +196,6 @@ class APIServer:
 			deployment = self.GetDepByLabel(info[1])
 			with deployment.lock:
 				deployment.pendingReqs.append(Request(info))
+				#print(Request(info))
 				deployment.waiting.set()
 		

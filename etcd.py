@@ -23,7 +23,7 @@ class Etcd:
 		self.runningPodList= []
 		self.deploymentList = []
 		self.microserviceList = []
-		self.microserviceTemplates = []
+		self.requestsList = []
 		self.nodeList = []
 		self.endPointList = []
 		self.reqCreator = ThreadPoolExecutor(max_workers=1)
